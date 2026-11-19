@@ -30774,7 +30774,7 @@ async def zalo_send_group_text(payload: dict = Body(...)):
     """Send ONE text to ONE Zalo GROUP through a Zalo connection of this machine (0.482.0).
 
     Called by the owner's class website (Send All on the attendance page) with curl-style localhost access, so it is
-    login-exempt through `_AUTH_LOCAL_EXACT` + `_local_tool_call` (a browser page cannot reach it).
+    login-exempt through `_AUTH_LOCAL_EXACT` + `_local_tool_call` (a browser page cannot reach it), or reachable by an API token of scope `zalo-send` (the class website in its own container).
     Body: {"conn_id": "<Zalo connection id>", "thread_id": "<group id>", "text": "<message>"}.
     GROUPS ONLY by design: the owner never writes to students in private chats, so this route has no private mode.
     Returns {"ok": true} only when Zalo took the message, else {"ok": false, "error": "..."}; never raises."""

@@ -6975,6 +6975,7 @@
           <label class="js-lbl">${esc(window.t("cs.ac_tk_scope"))}</label>
           <select class="js-input" id="tkScope">
             <option value="chat">${esc(window.t("cs.ac_tk_scope_chat"))}</option>
+            <option value="zalo-send">${esc(window.t("cs.ac_tk_scope_zalo_send"))}</option>
             <option value="full">${esc(window.t("cs.ac_tk_scope_full"))}</option>
           </select>
           <div class="js-actions"><button class="gcard-btn" id="tkCreate">${esc(window.t("cs.ac_tk_create"))}</button></div>
@@ -7229,7 +7230,7 @@
       const dung = Number(t.last_used_at) > 0
         ? window.t("cs.tk_last_used") + " " + new Date(Number(t.last_used_at) * 1000).toLocaleString(LOC())
         : window.t("cs.tk_never_used");
-      const pv = window.t(t.scope === "chat" ? "cs.tk_scope_chat" : "cs.tk_scope_full");
+      const pv = window.t(t.scope === "chat" ? "cs.tk_scope_chat" : t.scope === "zalo-send" ? "cs.tk_scope_zalo_send" : "cs.tk_scope_full");
       return `<div class="tk-row">
         <div class="tk-info">
           <b>${esc(t.name || window.t("cs.tk_noname"))}</b>

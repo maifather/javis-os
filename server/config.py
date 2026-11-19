@@ -1460,6 +1460,11 @@ TOKEN_PREFIX = "jvs_"
 # Đường mà token scope `chat` được đi. Danh sách TRẮNG, khớp theo tiền tố: thiếu tên nào thì
 # token đó bị từ chối chứ không lọt - fail-closed, đúng nếp của mọi hàng rào khác trong Javis.
 TOKEN_SCOPE_CHAT = ("/chat", "/version", "/health", "/sessions")
+# Scope `zalo-send` (0.482.x): ONE route, matched EXACTLY (no prefix), for the class website that posts the
+# recording link into a student's Zalo group. A leaked token can only send a text to a Zalo group through the
+# connection the caller names; it cannot read the brain, drive Javis or create tokens.
+TOKEN_SCOPE_ZALO_SEND = ("/zalo/send-group-text",)
+TOKEN_SCOPES = ("full", "chat", "zalo-send")
 
 
 def _load_tokens():
@@ -1494,7 +1499,7 @@ def create_api_token(name: str, scope: str = "full") -> dict:
     item = {
         "id": "tok_" + secrets.token_hex(6),
         "name": (str(name or "").strip() or "không tên")[:60],
-        "scope": "chat" if str(scope) == "chat" else "full",
+        "scope": str(scope) if str(scope) in TOKEN_SCOPES else "full",
         "hash": _token_hash(raw),
         "prefix": raw[:12],
         "created_at": _time.time(),
@@ -1536,6 +1541,10 @@ def verify_api_token(raw: str, path: str = ""):
         if secrets.compare_digest(str(x.get("hash") or ""), h):
             if str(x.get("scope")) == "chat" and path:
                 if not any(str(path).startswith(p) for p in TOKEN_SCOPE_CHAT):
+                    return None
+            if str(x.get("scope")) == "zalo-send":
+                # Fail-closed: an empty path is refused too, and the match is exact, so /zalo/send-group-text/x fails.
+                if str(path) not in TOKEN_SCOPE_ZALO_SEND:
                     return None
             x["last_used_at"] = _time.time()
             _save_tokens(_load_tokens_touch(x))

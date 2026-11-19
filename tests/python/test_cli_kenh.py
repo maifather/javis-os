@@ -118,6 +118,13 @@ check("CANARY: scope chat KHÔNG chạm được cài đặt",
 check("CANARY: scope chat KHÔNG chạm được kho token",
       cfg.verify_api_token(_tc["token"], "/auth/tokens") is None)
 
+_tz = cfg.create_api_token("website lớp", "zalo-send")
+check("scope zalo-send được lưu đúng", _tz["scope"] == "zalo-send")
+check("scope zalo-send vào được đường gửi nhóm Zalo", bool(cfg.verify_api_token(_tz["token"], "/zalo/send-group-text")))
+for _p in ("/chat", "/settings", "/auth/tokens", "/health", "/zalo/send-group-text/x", "/zalo/send-group-text2", ""):
+    check("CANARY: scope zalo-send KHÔNG chạm được " + (_p or "(đường rỗng)"), cfg.verify_api_token(_tz["token"], _p) is None)
+check("scope lạ rơi về full chứ không tạo scope mới", cfg.create_api_token("x", "bậy")["scope"] == "full")
+
 check("thu hồi được", cfg.revoke_api_token(_t["id"]) is True)
 check("CANARY: thu hồi rồi là chết ngay", cfg.verify_api_token(_t["token"], "/chat") is None)
 check("thu hồi id không có thì báo false", cfg.revoke_api_token("tok_khongco") is False)
